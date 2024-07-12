@@ -109,15 +109,29 @@ const affichageIdee = (idees) => {
         // Création d'une carte pour chaque idée
         const card = document.createElement('div');
         card.classList.add('card');
+        
+        // Définir les classes et icônes selon l'état d'approbation
+        let cardBorderClass = '';
+        if (idee.approved === true) {
+            cardBorderClass = 'border-success';
+        } else if (idee.approved === false) {
+            cardBorderClass = 'border-danger';
+        }
+
         card.innerHTML = `
-             <div class="card-body">
+            <div class="card-body ${cardBorderClass}">
                 <h5 class="card-title">${idee.libelle}</h5>
                 <h6 class="card-subtitle mb-2 text-muted">${idee.categorie}</h6>
                 <p class="card-text">${idee.description}</p>
-                <button class="btn btn-danger btn-sm delete-btn" data-index="${index}">
-                    <i class="fas fa-trash-alt"></i> 
+                <div class="approval-icons">
+                    ${idee.approved !== true ? `<i class="fas fa-thumbs-up approve-icon" data-index="${index}"></i>` : ''}
+                    ${idee.approved !== false ? `<i class="fas fa-thumbs-down disapprove-icon" data-index="${index}"></i>` : ''}
+                    <button class="btn btn-danger btn-sm delete-btn" data-index="${index}">
+                    <i class="fas fa-trash-alt"></i>
                 </button>
-            </div> 
+                </div>
+                
+            </div>
         `;
 
         // Ajout d'un gestionnaire d'événements pour le bouton de suppression
@@ -130,10 +144,28 @@ const affichageIdee = (idees) => {
             }
         });
 
+        // Ajout d'événements pour l'approbation et la désapprobation
+        const approveIconElement = card.querySelector('.approve-icon');
+        if (approveIconElement) {
+            approveIconElement.addEventListener('click', () => {
+                idees[index].approved = true; // Approuver l'idée
+                affichageIdee(idees); // Réafficher les idées mises à jour
+            });
+        }
+
+        const disapproveIconElement = card.querySelector('.disapprove-icon');
+        if (disapproveIconElement) {
+            disapproveIconElement.addEventListener('click', () => {
+                idees[index].approved = false; // Désapprouver l'idée
+                affichageIdee(idees); // Réafficher les idées mises à jour
+            });
+        }
 
         cards_section.appendChild(card);
     });
 }
+
+affichageIdee(idees);
 
 //fonction pour afficher un message d'erreur 
 const setError = (element, message)  => {

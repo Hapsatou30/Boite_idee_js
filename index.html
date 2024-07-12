@@ -10,7 +10,7 @@
 <body>
     <div class="container mt-5">
         <div class="form-image-section">
-            <form class="col-md-6">
+            <form class="col-md-6" id="form">
                 <h2>Formulaire </h2>
                 <div class="form-group-inline">
                     <div class="form-group">
@@ -32,7 +32,7 @@
                     <label for="description">Description</label>
                     <textarea class="form-control" id="description" rows="3" placeholder="Entrez votre message"></textarea>
                 </div>
-                <button type="submit" class="btn btn-primary">Ajouter</button>
+                <button type="submit" class="btn " id="submit-button">Ajouter</button>
             </form>
             <div class="col-md-6">
                 <img src="./images/boite.jpg" class="img-fluid" alt="Image placeholder">
@@ -42,6 +42,6 @@
             <!-- Les cartes seront chargées ici dynamiquement -->
         </div>
     </div>
-    
+    <script src="main.js"></script>
 </body>
 </html>

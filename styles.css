@@ -36,6 +36,7 @@ form .btn{
 form .btn:hover{
     background: #f67795;
     border: #f67795;
+    color: white;
     
 }
 .cards-section {

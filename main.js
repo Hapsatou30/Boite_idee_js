@@ -11,7 +11,13 @@ let idees = [];
 const regexNoDigits = /^[^\d]*$/; 
 const regexNoHTML = /<\/?[^>]+(>|$)/g; 
 // Liste des catégories valides
-const validCategories = ["Politique", "Sport", "Sante", "Education", "Autre"];
+const validCategories = [
+    { name: "Politique", image: "https://www.leparisien.fr/resizer/Y3nncH8lt8e_l906tUG9ug0okXo=/932x582/cloudfront-eu-central-1.images.arcpublishing.com/leparisien/ERSNC4R5GVAS3N75DVLNBK6HY4.jpg" },
+    { name: "Sport", image: "https://i.ytimg.com/vi/evftqcUAsLk/maxresdefault.jpg" },
+    { name: "Sante", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQQliC8GApWw0vWibBrayTjzBMUS8Fa0I-vOQ&s" },
+    { name: "Education", image: "https://ared-edu.org/wp-content/uploads/2021/06/KEURNDIAYE30-scaled.jpg" },
+    { name: "Autre", image: "https://img.freepik.com/vecteurs-libre/jeu-isometrique-personnes-jeux-societe_1284-23221.jpg?t=st=1720806000~exp=1720809600~hmac=4f303211dea223d53c3ae602634432657ed074380d56c126a12a70754f2a1bec&w=740" }
+];
 
 
 // Récupérer les données depuis localStorage au chargement de la page
@@ -49,12 +55,13 @@ form.addEventListener('submit', e =>{
     if (valeurCategorie === '') {
         setError(categorie, 'Vous devez choisir une catégorie');
         isValid = false;
-    } else if (!validCategories.includes(valeurCategorie)) {
+    } else if (!validCategories.some(category => category.name === valeurCategorie)) {
         setError(categorie, "Cette catégorie n'existe pas");
         isValid = false;
     } else {
         setSuccess(categorie);
     }
+
 
      // Validation de la description
      const valeurDescription = description.value.trim();
@@ -120,11 +127,18 @@ const resetForm = () => {
     categorie.parentElement.classList.remove('success', 'error');
     description.parentElement.classList.remove('success', 'error');
 }
-
 const affichageIdee = (idees) => {
     cards_section.innerHTML = ''; // Efface le contenu précédent
 
     idees.forEach((idee, index) => {
+        // Trouver l'objet catégorie correspondant dans validCategories
+        const categorieObj = validCategories.find(cat => cat.name === idee.categorie);
+
+        if (!categorieObj) {
+            console.error(`La catégorie "${idee.categorie}" n'a pas d'image associée.`);
+            return;
+        }
+
         // Création d'une carte pour chaque idée
         const card = document.createElement('div');
         card.classList.add('card');
@@ -139,17 +153,17 @@ const affichageIdee = (idees) => {
 
         card.innerHTML = `
             <div class="card-body ${cardBorderClass}">
+                <img src="${categorieObj.image}" alt="${idee.categorie}" class="category-image" />
                 <h5 class="card-title">${idee.libelle}</h5>
-                <h6 class="card-subtitle mb-2 text-muted">${idee.categorie}</h6>
-                <p class="card-text">${idee.description}</p>
+                <h6 class="card-subtitle mb-2 text-muted"> Catégorie: ${idee.categorie}</h6>
+                <p class="card-text mb-5">${idee.description}</p>
                 <div class="approval-icons">
                     ${idee.approved !== true ? `<i class="fas fa-thumbs-up approve-icon" data-index="${index}"></i>` : ''}
                     ${idee.approved !== false ? `<i class="fas fa-thumbs-down disapprove-icon" data-index="${index}"></i>` : ''}
                     <button class="btn btn-danger btn-sm delete-btn" data-index="${index}">
-                    <i class="fas fa-trash-alt"></i>
-                </button>
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
                 </div>
-                
             </div>
         `;
 
@@ -161,7 +175,6 @@ const affichageIdee = (idees) => {
                 idees.splice(index, 1); // Supprimer l'idée du tableau
                 affichageIdee(idees); // Réafficher les idées mises à jour
                 localStorage.setItem('idees', JSON.stringify(idees));
-
             }
         });
 
@@ -172,7 +185,6 @@ const affichageIdee = (idees) => {
                 idees[index].approved = true; // Approuver l'idée
                 affichageIdee(idees); // Réafficher les idées mises à jour
                 localStorage.setItem('idees', JSON.stringify(idees));
-
             });
         }
 
@@ -182,7 +194,6 @@ const affichageIdee = (idees) => {
                 idees[index].approved = false; // Désapprouver l'idée
                 affichageIdee(idees); // Réafficher les idées mises à jour
                 localStorage.setItem('idees', JSON.stringify(idees));
-
             });
         }
 

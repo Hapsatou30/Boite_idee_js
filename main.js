@@ -4,12 +4,19 @@ const categorie = document.getElementById('categorie');
 const description = document.getElementById('description');
 const submit_button = document.getElementById('submit-button');
 const cards_section = document.getElementById('cards-section');
+const counter = document.getElementById('char-counter');
+const maxLenght = description.getAttribute('maxlength');
 let idees = [];
 // Expressions régulières pour vérifier l'absence de chiffres et de balises HTML
 const regexNoDigits = /^[^\d]*$/; 
 const regexNoHTML = /<\/?[^>]+(>|$)/g; 
 // Liste des catégories valides
 const validCategories = ["Politique", "Sport", "Sante", "Education", "Autre"];
+
+
+// Récupérer les données depuis localStorage au chargement de la page
+const ideesFromStorage = JSON.parse(localStorage.getItem('idees')) || [];
+idees = ideesFromStorage; // Mettre à jour le tableau idees avec les données récupérées
 
 
 // Ajout d'un écouteur d'événement pour la soumission du formulaire
@@ -54,8 +61,8 @@ form.addEventListener('submit', e =>{
      if (valeurDescription === '') {
          setError(description, 'La description est obligatoire');
          isValid = false;
-     } else if (valeurDescription.length < 10 || valeurDescription.length > 250) {
-         setError(description, 'La description doit contenir entre 10 et 250 caractères');
+     } else if (valeurDescription.length < 10 || valeurDescription.length > 255) {
+         setError(description, 'La description doit contenir entre 10 et 255 caractères');
          isValid = false;
      } else if (!regexNoDigits.test(valeurDescription)) {
          setError(description, 'La description ne doit pas contenir de chiffres');
@@ -67,7 +74,12 @@ form.addEventListener('submit', e =>{
          setSuccess(description);
      }
 
-    
+    // Afficher un message d'erreur si les validations ont échoué
+    if (!isValid) {
+        displayMessage('Veuillez corriger les erreurs dans le formulaire.', false);
+        return;
+    }
+
     // Si toutes les validations sont réussies, ajouter la nouvelle idée
     if (isValid) {
         const libelleValue = libelle.value;
@@ -87,6 +99,13 @@ form.addEventListener('submit', e =>{
         affichageIdee(idees);
 
         resetForm();
+        // Afficher un message de succès
+    displayMessage('L\'idée a été ajoutée avec succès.', true);
+
+
+         // Sauvegarder dans localStorage
+    localStorage.setItem('idees', JSON.stringify(idees));
+
     }
 });
 
@@ -141,6 +160,8 @@ const affichageIdee = (idees) => {
             if (confirmation) {
                 idees.splice(index, 1); // Supprimer l'idée du tableau
                 affichageIdee(idees); // Réafficher les idées mises à jour
+                localStorage.setItem('idees', JSON.stringify(idees));
+
             }
         });
 
@@ -150,6 +171,8 @@ const affichageIdee = (idees) => {
             approveIconElement.addEventListener('click', () => {
                 idees[index].approved = true; // Approuver l'idée
                 affichageIdee(idees); // Réafficher les idées mises à jour
+                localStorage.setItem('idees', JSON.stringify(idees));
+
             });
         }
 
@@ -158,6 +181,8 @@ const affichageIdee = (idees) => {
             disapproveIconElement.addEventListener('click', () => {
                 idees[index].approved = false; // Désapprouver l'idée
                 affichageIdee(idees); // Réafficher les idées mises à jour
+                localStorage.setItem('idees', JSON.stringify(idees));
+
             });
         }
 
@@ -186,3 +211,33 @@ const setSuccess = (element, message)  => {
     inputControl.classList.add('success');
     inputControl.classList.remove('error');
 }
+const displayMessage = (message, isSuccess) => {
+    const messageDiv = document.createElement('div');
+    messageDiv.classList.add('message', isSuccess ? 'success' : 'error');
+    messageDiv.textContent = message;
+
+    // Insérer le message avant le formulaire
+    form.parentElement.insertBefore(messageDiv, form);
+
+    // Masquer le formulaire pendant l'affichage du message
+    form.style.display = 'none';
+
+    setTimeout(() => {
+        // Retirer le message
+        messageDiv.remove();
+        form.style.display = 'block'; // Afficher à nouveau le formulaire après 2 secondes
+    }, 2000); // Affiche le message pendant 2 secondes
+};
+
+// Écouteur d'événement pour mettre à jour le compteur de caractères
+description.addEventListener('input', e => {
+    const maxLength = 255;
+    const currentLength = e.target.value.length;
+
+    const leftCharLength = maxLength - currentLength;
+
+    if (leftCharLength < 0) return;
+
+    // Mise à jour du texte du compteur avec la valeur actuelle et le total
+    counter.innerText = `${currentLength}/${maxLength}`;
+});

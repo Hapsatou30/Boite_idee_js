@@ -10,12 +10,13 @@
 <body>
     <div class="container mt-5">
         <div class="form-image-section">
-            <form class="col-md-6">
+            <form class="col-md-6" id="form">
                 <h2>Formulaire </h2>
                 <div class="form-group-inline">
                     <div class="form-group">
                         <label for="libelle">Libellé</label>
                         <input type="text" class="form-control" id="libelle" placeholder="Entrez le libellé">
+                        <div class="error"></div>
                     </div>
                     <div class="form-group">
                         <label for="categorie">Catégorie</label>
@@ -26,22 +27,27 @@
                             <option value="Education">Éducation</option>
                             <option value="Autre">Autre</option>
                         </select>
+                        <div class="error"></div>
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="description">Description</label>
                     <textarea class="form-control" id="description" rows="3" placeholder="Entrez votre message"></textarea>
+                    <div class="error"></div>
                 </div>
-                <button type="submit" class="btn btn-primary">Ajouter</button>
+                <button type="submit" class="btn " id="submit-button">Ajouter</button>
             </form>
             <div class="col-md-6">
                 <img src="./images/boite.jpg" class="img-fluid" alt="Image placeholder">
             </div>
         </div>
+        <hr><br>
+        <h2>Liste des idées</h2>
         <div class="cards-section" id="cards-section">
+           
             <!-- Les cartes seront chargées ici dynamiquement -->
         </div>
     </div>
-    
+    <script src="main.js"></script>
 </body>
 </html>

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boite à Idées</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="form-image-section">
+            <form class="col-md-6">
+                <h2>Formulaire </h2>
+                <div class="form-group-inline">
+                    <div class="form-group">
+                        <label for="libelle">Libellé</label>
+                        <input type="text" class="form-control" id="libelle" placeholder="Entrez le libellé">
+                    </div>
+                    <div class="form-group">
+                        <label for="categorie">Catégorie</label>
+                        <select class="form-control" id="categorie">
+                            <option value="Politique">Politique</option>
+                            <option value="Sport">Sport</option>
+                            <option value="Santé">Santé</option>
+                            <option value="Education">Éducation</option>
+                            <option value="Autre">Autre</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <textarea class="form-control" id="description" rows="3" placeholder="Entrez votre message"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Ajouter</button>
+            </form>
+            <div class="col-md-6">
+                <img src="./images/boite.jpg" class="img-fluid" alt="Image placeholder">
+            </div>
+        </div>
+        <div class="cards-section" id="cards-section">
+            <!-- Les cartes seront chargées ici dynamiquement -->
+        </div>
+    </div>
+    
+</body>
+</html>

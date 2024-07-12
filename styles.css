@@ -1,0 +1,48 @@
+body{
+    font-family: 'Roboto';
+}
+.form-image-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+   
+}
+form{
+    border: 20px solid #f67795;
+    padding: 20px;
+}
+ form h2{
+    color: #f67795;
+    font-weight: bold;
+    font-family: 'Montserrat';
+    text-align: center;
+    margin-bottom: 30px;
+ }
+.form-group-inline {
+    display: flex;
+    justify-content: space-between;
+}
+.form-group-inline .form-group {
+    flex: 0 0 48%;
+}
+form .btn{
+    background: transparent;
+    border:2px solid #f67795;
+    color: #f67795;
+    font-weight: 800;
+
+}
+form .btn:hover{
+    background: #f67795;
+    border: #f67795;
+    
+}
+.cards-section {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.card {
+    flex: 1 1 calc(25% - 10px);
+}

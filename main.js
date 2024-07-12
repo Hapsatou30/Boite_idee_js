@@ -102,21 +102,35 @@ const resetForm = () => {
     description.parentElement.classList.remove('success', 'error');
 }
 
-//fonction pour afficher la liste des idées par carte
 const affichageIdee = (idees) => {
     cards_section.innerHTML = ''; // Efface le contenu précédent
 
-    idees.forEach(idee => {
+    idees.forEach((idee, index) => {
         // Création d'une carte pour chaque idée
         const card = document.createElement('div');
         card.classList.add('card');
         card.innerHTML = `
-            <div class="card-body">
+             <div class="card-body">
                 <h5 class="card-title">${idee.libelle}</h5>
                 <h6 class="card-subtitle mb-2 text-muted">${idee.categorie}</h6>
                 <p class="card-text">${idee.description}</p>
+                <button class="btn btn-danger btn-sm delete-btn" data-index="${index}">
+                    <i class="fas fa-trash-alt"></i> 
+                </button>
             </div> 
         `;
+
+        // Ajout d'un gestionnaire d'événements pour le bouton de suppression
+        const deleteButton = card.querySelector('.delete-btn');
+        deleteButton.addEventListener('click', () => {
+            const confirmation = confirm("Êtes-vous sûr de vouloir supprimer cette idée ?");
+            if (confirmation) {
+                idees.splice(index, 1); // Supprimer l'idée du tableau
+                affichageIdee(idees); // Réafficher les idées mises à jour
+            }
+        });
+
+
         cards_section.appendChild(card);
     });
 }

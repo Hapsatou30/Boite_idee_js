@@ -40,6 +40,17 @@ form .btn:hover{
     color: white;
     
 }
+.form-group.success input,  .form-group.success select, .form-group.success textarea{
+    border-color: green;
+}
+.form-group.error input, .form-group.success textarea{
+    border-color: #ce0033;
+}
+.form-group .error{
+    color: #ce0033;
+    font-size: 10px;
+    height: 13px;
+}
 .cards-section {
     display: flex;
     flex-wrap: wrap;

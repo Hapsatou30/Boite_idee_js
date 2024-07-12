@@ -95,6 +95,11 @@ const resetForm = () => {
     libelle.value = '';
     categorie.value = '';
     description.value = '';
+
+
+    libelle.parentElement.classList.remove('success', 'error');
+    categorie.parentElement.classList.remove('success', 'error');
+    description.parentElement.classList.remove('success', 'error');
 }
 
 //fonction pour afficher la liste des idées par carte

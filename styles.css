@@ -11,8 +11,9 @@ body{
 form{
     border: 20px solid #f67795;
     padding: 20px;
+    border-radius: 8px;
 }
- form h2{
+ h2{
     color: #f67795;
     font-weight: bold;
     font-family: 'Montserrat';
@@ -46,4 +47,9 @@ form .btn:hover{
 }
 .card {
     flex: 1 1 calc(25% - 10px);
+    margin-bottom: 10px;
+}
+.card-title{
+    color:#000000;
+    font-weight: 800;
 }

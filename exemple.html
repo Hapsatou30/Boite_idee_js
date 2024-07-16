@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boite à Idées</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="form-image-section">
+            <form class="col-md-6" id="form">
+                <h2>Formulaire </h2>
+                <div class="form-group-inline">
+                    <div class="form-group">
+                        <label for="libelle">Libellé</label>
+                        <input type="text" class="form-control" id="libelle" placeholder="Entrez le libellé">
+                        <div class="error"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="categorie">Catégorie</label>
+                        <select class="form-control" id="categorie">
+                            <option value="Politique">Politique</option>
+                            <option value="Sport">Sport</option>
+                            <option value="Sante">Santé</option>
+                            <option value="Education">Éducation</option>
+                            <option value="Autre">Autre</option>
+                        </select>
+                        <div class="error"></div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <textarea class="form-control" id="description" rows="3" placeholder="Entrez votre message" maxlength="255"></textarea>
+                    <div class="error"></div>
+                    <div id="char-counter" class="char-counter">0/255</div>
+                </div>
+                <button type="submit" class="btn " id="submit-button">Ajouter</button>
+            </form>
+            <div class="col-md-6">
+                <img src="./images/boite.jpg" class="img-fluid" alt="Image placeholder">
+            </div>
+        </div>
+        <hr><br>
+        <h2>Liste des idées</h2>
+        <div class="cards-section" id="cards-section">
+            <!-- Les cartes seront chargées ici dynamiquement -->
+        </div>
+    </div>
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
+        import { getDatabase, ref, set, push, onValue, update, remove } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-database.js";
+
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+          apiKey: "AIzaSyBw1_65aoUoPL1FoaHcQ8vVvslirhzeP-g",
+          authDomain: "crud-js-640cd.firebaseapp.com",
+          databaseURL: "https://www.gstatic.com/firebasejs/10.12.3/firebase-database.js",
+          projectId: "crud-js-640cd",
+          storageBucket: "crud-js-640cd.appspot.com",
+          messagingSenderId: "1020319419055",
+          appId: "1:1020319419055:web:2e897fd2545b021636e25a"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // JavaScript code
+        const form = document.getElementById('form');
+        const libelle = document.getElementById('libelle');
+        const categorie = document.getElementById('categorie');
+        const description = document.getElementById('description');
+        const submit_button = document.getElementById('submit-button');
+        const cards_section = document.getElementById('cards-section');
+        const counter = document.getElementById('char-counter');
+        const maxLenght = description.getAttribute('maxlength');
+        let idees = [];
+
+        // Expressions régulières pour vérifier l'absence de chiffres et de balises HTML
+        const regexNoDigits = /^[^\d]*$/; 
+        const regexNoHTML = /<\/?[^>]+(>|$)/g; 
+        // Liste des catégories valides
+        const validCategories = [
+            { name: "Politique", image: "https://www.leparisien.fr/resizer/Y3nncH8lt8e_l906tUG9ug0okXo=/932x582/cloudfront-eu-central-1.images.arcpublishing.com/leparisien/ERSNC4R5GVAS3N75DVLNBK6HY4.jpg" },
+            { name: "Sport", image: "https://i.ytimg.com/vi/evftqcUAsLk/maxresdefault.jpg" },
+            { name: "Sante", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQQliC8GApWw0vWibBrayTjzBMUS8Fa0I-vOQ&s" },
+            { name: "Education", image: "https://ared-edu.org/wp-content/uploads/2021/06/KEURNDIAYE30-scaled.jpg" },
+            { name: "Autre", image: "https://img.freepik.com/vecteurs-libre/jeu-isometrique-personnes-jeux-societe_1284-23221.jpg?t=st=1720806000~exp=1720809600~hmac=4f303211dea223d53c3ae602634432657ed074380d56c126a12a70754f2a1bec&w=740" }
+        ];
+
+        // Récupérer les données depuis Firebase au chargement de la page
+        const ideesRef = ref(db, 'idees');
+        onValue(ideesRef, (snapshot) => {
+            const data = snapshot.val();
+            idees = data ? Object.values(data) : [];
+            affichageIdee(idees);
+        });
+
+        // Ajout d'un écouteur d'événement pour la soumission du formulaire
+        form.addEventListener('submit', e =>{
+            e.preventDefault();
+
+            let isValid = true;
+
+            // Validation du libelle
+            const valeurLibelle = libelle.value.trim();
+            if (valeurLibelle === '') {
+                setError(libelle, 'Le libelle est obligatoire');
+                isValid = false;
+            } else if (valeurLibelle.length < 5 || valeurLibelle.length > 50) {
+                setError(libelle, 'Le libelle doit contenir entre 5 et 50 caractères');
+                isValid = false;
+            } else if (!regexNoDigits.test(valeurLibelle)) {
+                setError(libelle, 'Le libelle ne doit pas contenir de chiffres');
+                isValid = false;
+            } else if (regexNoHTML.test(valeurLibelle)) {
+                setError(libelle, 'Le libelle ne doit pas contenir de balises HTML');
+                isValid = false;
+            } else {
+                setSuccess(libelle);
+            }
+
+            // Validation de la categorie
+            const valeurCategorie = categorie.value.trim();
+            if (valeurCategorie === '') {
+                setError(categorie, 'Vous devez choisir une catégorie');
+                isValid = false;
+            } else if (!validCategories.some(category => category.name === valeurCategorie)) {
+                setError(categorie, "Cette catégorie n'existe pas");
+                isValid = false;
+            } else {
+                setSuccess(categorie);
+            }
+
+            // Validation de la description
+            const valeurDescription = description.value.trim();
+            if (valeurDescription === '') {
+                setError(description, 'La description est obligatoire');
+                isValid = false;
+            } else if (valeurDescription.length < 10 || valeurDescription.length > 255) {
+                setError(description, 'La description doit contenir entre 10 et 255 caractères');
+                isValid = false;
+            } else if (!regexNoDigits.test(valeurDescription)) {
+                setError(description, 'La description ne doit pas contenir de chiffres');
+                isValid = false;
+            } else if (regexNoHTML.test(valeurDescription)) {
+                setError(description, 'La description ne doit pas contenir de balises HTML');
+                isValid = false;
+            } else {
+                setSuccess(description);
+            }
+
+            // Afficher un message d'erreur si les validations ont échoué
+            if (!isValid) {
+                displayMessage('Veuillez corriger les erreurs dans le formulaire.', false);
+                return;
+            }
+
+            // Si toutes les validations sont réussies, ajouter la nouvelle idée
+            if (isValid) {
+                const libelleValue = libelle.value;
+                const categorieValue = categorie.value;
+                const descriptionValue = description.value;
+
+                // Ajouter la nouvelle idée à Firebase
+                const nouvelleIdeeRef = push(ideesRef);
+                set(nouvelleIdeeRef, {
+                    libelle: libelleValue,
+                    categorie: categorieValue,
+                    description: descriptionValue
+                }).then(() => {
+                    // Réinitialiser le formulaire
+                    form.reset();
+                    counter.textContent = `0/${maxLenght}`;
+                    displayMessage('Idée ajoutée avec succès.', true);
+                }).catch(error => {
+                    displayMessage('Erreur lors de l\'ajout de l\'idée.', false);
+                });
+            }
+        });
+
+        // Mettre à jour le compteur de caractères
+        description.addEventListener('input', () => {
+            const longueur = description.value.length;
+            counter.textContent = `${longueur}/${maxLenght}`;
+        });
+
+        // Fonction pour définir les messages d'erreur
+        function setError(element, message) {
+            const errorDisplay = element.nextElementSibling;
+            errorDisplay.innerText = message;
+            errorDisplay.classList.add('error-message');
+            errorDisplay.classList.remove('success-message');
+        }
+
+        // Fonction pour définir les messages de succès
+        function setSuccess(element) {
+            const errorDisplay = element.nextElementSibling;
+            errorDisplay.innerText = '';
+            errorDisplay.classList.remove('error-message');
+            errorDisplay.classList.add('success-message');
+        }
+
+        // Fonction pour afficher un message
+        function displayMessage(message, isSuccess) {
+            const messageDisplay = document.createElement('div');
+            messageDisplay.classList.add(isSuccess ? 'success-message' : 'error-message');
+            messageDisplay.innerText = message;
+            document.body.appendChild(messageDisplay);
+            setTimeout(() => {
+                messageDisplay.remove();
+            }, 3000);
+        }
+
+        // Fonction pour afficher les idées sous forme de cartes
+        function affichageIdee(idees) {
+            cards_section.innerHTML = '';
+            idees.forEach((idee, index) => {
+                const category = validCategories.find(category => category.name === idee.categorie);
+                if (category) {
+                    const image = category.image;
+                    const cardHTML = `
+                        <div class="card" id="idee-${index}">
+                            <img src="${image}" class="card-img-top" alt="${idee.categorie}">
+                            <div class="card-body">
+                                <h5 class="card-title">${idee.libelle}</h5>
+                                <p class="card-text">${idee.description}</p>
+                                <p class="card-category">${idee.categorie}</p>
+                                <button class="btn btn-danger" onclick="deleteIdee('${idee.id}')">Supprimer</button>
+                            </div>
+                        </div>
+                    `;
+                    cards_section.innerHTML += cardHTML;
+                }
+            });
+        }
+
+        // Fonction pour supprimer une idée
+        window.deleteIdee = (id) => {
+            const ideeRef = ref(db, `idees/${id}`);
+            remove(ideeRef).then(() => {
+                displayMessage('Idée supprimée avec succès.', true);
+            }).catch(error => {
+                displayMessage('Erreur lors de la suppression de l\'idée.', false);
+            });
+        };
+
+    </script>
+</body>
+</html>

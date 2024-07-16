@@ -131,3 +131,18 @@ form .btn:hover{
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Ombre légère */
 }
 
+/* Styles pour mobile */
+@media (max-width: 768px) {
+    .form-image-section {
+        flex-direction: column; /* Passer en colonne pour les mobiles */
+        align-items: center;
+    }
+
+    .form-group-inline .form-group {
+        flex: 1; /* Utiliser tout l'espace disponible */
+    }
+
+    .card {
+        flex: 1 1 calc(100% - 10px); /* Une carte par ligne sur mobile */
+    }
+}
